@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGL</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    body {
+      margin: 0;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+  </style>
+</head>
+
+<body onload="main()">
+  <canvas id="canvas"></canvas>
+  <script src="main.js"></script>
+  <script src="util.js"></script>
+  <script id="fragmentShaderCode" type="notjs">
+    precision mediump float;
+
+    varying vec3 v_normal;
+    varying vec4 v_color;
+
+    uniform vec4 u_diffuse;
+    uniform vec3 u_lightDirection;
+
+    void main () {
+      vec3 normal = normalize(v_normal);
+      float fakeLight = dot(u_lightDirection, normal) * .5 + .5;
+      vec4 diffuse = u_diffuse * v_color;
+      gl_FragColor = vec4(diffuse.rgb * fakeLight, diffuse.a);
+    }
+  </script>
+  <script id="vertexShaderCode" type="notjs">
+    attribute vec4 a_position;
+    attribute vec3 a_normal;
+    attribute vec4 a_color;
+
+    uniform mat4 u_projection;
+    uniform mat4 u_view;
+    uniform mat4 u_world;
+
+    varying vec3 v_normal;
+    varying vec4 v_color;
+
+    void main() {
+      gl_Position = u_projection * u_view * u_world * a_position;
+      v_normal = mat3(u_world) * a_normal;
+      v_color = a_color;
+    }
+  </script>
+  <!--
+    for most samples webgl-utils only provides shader compiling/linking and
+    canvas resizing because why clutter the examples with code that's the same in every sample.
+    See https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+    and https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+    for webgl-utils, m3, m4, and webgl-lessons-ui.
+    -->
+  <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+  <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+</body>
+
+</html>
